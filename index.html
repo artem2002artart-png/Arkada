@@ -571,6 +571,33 @@
           padding: 13px;
         }
       }
+
+      /* Дополнительный запас снизу для iframe VK и длинного экрана результата */
+      body {
+        padding-bottom: max(64px, calc(env(safe-area-inset-bottom) + 48px));
+        scroll-padding-bottom: 64px;
+      }
+
+      #resultPanel {
+        padding-bottom: 34px;
+        margin-bottom: 28px;
+      }
+
+      .online-status {
+        min-height: 24px;
+        padding: 4px 2px;
+        overflow-wrap: anywhere;
+        word-break: normal;
+      }
+
+      #shareStatus {
+        max-width: 100%;
+        line-height: 1.5;
+      }
+
+      .menu-actions {
+        padding-bottom: 8px;
+      }
     </style>
   </head>
 
@@ -1898,15 +1925,36 @@
           window.vkBridge.send('VKWebAppInit').then(function () {
             var isMobileVK = /vk_platform=(mobile_web|mobile_android|mobile_iphone)/.test(window.location.search);
             if (!isMobileVK) {
-              var pageHeight = Math.max(
-                document.documentElement.scrollHeight,
-                document.body.scrollHeight,
-                700
-              );
-              window.vkBridge.send('VKWebAppResizeWindow', {
-                width: Math.min(Math.max(window.innerWidth || 911, 320), 1000),
-                height: Math.min(pageHeight, 1200)
-              }).catch(function () {});
+              var lastHeight = 0;
+              var resizeTimer = null;
+              function resizeVkWindow() {
+                var pageHeight = Math.max(
+                  document.documentElement.scrollHeight,
+                  document.body.scrollHeight,
+                  740
+                );
+                pageHeight = Math.min(pageHeight + 24, 1200);
+                if (Math.abs(pageHeight - lastHeight) < 4) return;
+                lastHeight = pageHeight;
+                window.vkBridge.send('VKWebAppResizeWindow', {
+                  width: Math.min(Math.max(window.innerWidth || 911, 320), 1000),
+                  height: pageHeight
+                }).catch(function () {});
+              }
+              function scheduleVkResize() {
+                if (resizeTimer) clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(resizeVkWindow, 100);
+              }
+              resizeVkWindow();
+              if (window.ResizeObserver) {
+                var vkResizeObserver = new ResizeObserver(scheduleVkResize);
+                vkResizeObserver.observe(document.body);
+                vkResizeObserver.observe(document.documentElement);
+              }
+              window.addEventListener('resize', scheduleVkResize);
+              window.addEventListener('load', scheduleVkResize);
+              setTimeout(scheduleVkResize, 350);
+              setTimeout(scheduleVkResize, 1000);
             }
           }).catch(function () {});
         }
