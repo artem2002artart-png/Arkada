@@ -645,6 +645,40 @@
         }
       }
 
+
+      /* ===== Кастомная внутренняя полоса прокрутки ===== */
+      body {
+        scrollbar-width: thin;
+        scrollbar-color: #6575e8 #101d30;
+      }
+      body::-webkit-scrollbar {
+        width: 10px;
+      }
+      body::-webkit-scrollbar-track {
+        background: rgba(16, 29, 48, 0.78);
+        border-left: 1px solid rgba(101, 117, 232, 0.16);
+        border-radius: 999px;
+      }
+      body::-webkit-scrollbar-thumb {
+        min-height: 42px;
+        background: linear-gradient(180deg, #8b7bff 0%, #5368e8 55%, #38a8ff 100%);
+        border: 2px solid #101d30;
+        border-radius: 999px;
+        box-shadow: 0 0 8px rgba(111, 105, 255, 0.32);
+      }
+      body::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #b0a5ff 0%, #7b8aff 55%, #62c5ff 100%);
+        box-shadow: 0 0 12px rgba(111, 105, 255, 0.62);
+      }
+      body::-webkit-scrollbar-corner {
+        background: #101d30;
+      }
+      @media (max-width: 600px) {
+        body::-webkit-scrollbar {
+          width: 6px;
+        }
+      }
+
     </style>
   </head>
 
